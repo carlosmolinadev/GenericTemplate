@@ -9,15 +9,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Client", "Template
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Shared", "Template\Shared\Template.Shared.csproj", "{146FDAEE-2D69-4B5E-8EE2-7A8AD7836BA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Core", "Template.Core\Template.Core.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Identity", "Template.Infrastructure.Identity\Template.Infrastructure.Identity.csproj", "{C40DEAE7-38C6-46DF-A2EE-284DFE290526}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity", "Infrastructure.Identity\Identity.csproj", "{C40DEAE7-38C6-46DF-A2EE-284DFE290526}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Persistance", "Template.Infrastructure.Persistance\Template.Infrastructure.Persistance.csproj", "{C3DBA51D-1004-4CF3-A6E6-4E9D8F0C8A87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance", "Infrastructure.Persistance\Persistance.csproj", "{C3DBA51D-1004-4CF3-A6E6-4E9D8F0C8A87}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain", "Template.Domain\Template.Domain.csproj", "{9714399C-A6F0-4617-9470-251B0B19975C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{9714399C-A6F0-4617-9470-251B0B19975C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Persistance.Dapper", "Template.Infrastructure.Persistance.Dapper\Template.Infrastructure.Persistance.Dapper.csproj", "{3E743129-7C64-485F-B09A-DC6D7A1206A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistance.Dapper", "Infrastructure.Persistance.Dapper\Persistance.Dapper.csproj", "{3E743129-7C64-485F-B09A-DC6D7A1206A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Template", "Template", "{15D65E55-61DB-46CF-A992-9095A36E911D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FD7F1904-5748-4F46-B341-4229DBCE51C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{3CF2BCB8-B1B3-4160-BF3C-22C8F71CFE0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +66,16 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4CAC44AA-B79E-4609-86D4-D1BBD4435EE5} = {15D65E55-61DB-46CF-A992-9095A36E911D}
+		{87DF12C3-D74F-49B9-8F6D-40B368E4692B} = {15D65E55-61DB-46CF-A992-9095A36E911D}
+		{146FDAEE-2D69-4B5E-8EE2-7A8AD7836BA0} = {15D65E55-61DB-46CF-A992-9095A36E911D}
+		{E565509B-B49B-4DE1-B8E5-085AB30D34C2} = {3CF2BCB8-B1B3-4160-BF3C-22C8F71CFE0A}
+		{C40DEAE7-38C6-46DF-A2EE-284DFE290526} = {FD7F1904-5748-4F46-B341-4229DBCE51C2}
+		{C3DBA51D-1004-4CF3-A6E6-4E9D8F0C8A87} = {FD7F1904-5748-4F46-B341-4229DBCE51C2}
+		{9714399C-A6F0-4617-9470-251B0B19975C} = {3CF2BCB8-B1B3-4160-BF3C-22C8F71CFE0A}
+		{3E743129-7C64-485F-B09A-DC6D7A1206A8} = {FD7F1904-5748-4F46-B341-4229DBCE51C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {26510BE8-CB77-4E9B-A584-77F735D1DB9D}

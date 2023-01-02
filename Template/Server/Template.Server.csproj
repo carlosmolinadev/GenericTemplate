@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Template.Core\Template.Core.csproj" />
-    <ProjectReference Include="..\..\Template.Infrastructure.Persistance.Dapper\Template.Infrastructure.Persistance.Dapper.csproj" />
+    <ProjectReference Include="..\..\Core\Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure.Persistance.Dapper\Persistance.Dapper.csproj" />
     <ProjectReference Include="..\Client\Template.Client.csproj" />
     <ProjectReference Include="..\Shared\Template.Shared.csproj" />
   </ItemGroup>
