@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Client", "Template
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Shared", "Template\Shared\Template.Shared.csproj", "{146FDAEE-2D69-4B5E-8EE2-7A8AD7836BA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Core.Application", "Template.DAL\Template.Core.Application.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Core.Application", "Template.Core\Template.Core.Application.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Identity", "Template.Infrastructure.Identity\Template.Infrastructure.Identity.csproj", "{C40DEAE7-38C6-46DF-A2EE-284DFE290526}"
 EndProject
