@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Client", "Template
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Shared", "Template\Shared\Template.Shared.csproj", "{146FDAEE-2D69-4B5E-8EE2-7A8AD7836BA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Core.Application", "Template.Core\Template.Core.Application.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Core", "Template.Core\Template.Core.csproj", "{E565509B-B49B-4DE1-B8E5-085AB30D34C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Identity", "Template.Infrastructure.Identity\Template.Infrastructure.Identity.csproj", "{C40DEAE7-38C6-46DF-A2EE-284DFE290526}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Per
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Domain", "Template.Domain\Template.Domain.csproj", "{9714399C-A6F0-4617-9470-251B0B19975C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Template.Infrastructure.Persistance.Dapper", "Template.Infrastructure.Persistance.Dapper\Template.Infrastructure.Persistance.Dapper.csproj", "{3E743129-7C64-485F-B09A-DC6D7A1206A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.Infrastructure.Persistance.Dapper", "Template.Infrastructure.Persistance.Dapper\Template.Infrastructure.Persistance.Dapper.csproj", "{3E743129-7C64-485F-B09A-DC6D7A1206A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
