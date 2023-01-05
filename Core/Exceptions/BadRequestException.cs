@@ -1,4 +1,4 @@
-﻿namespace Template.Core.Application.Exceptions
+﻿namespace Core.Exceptions
 {
     public class BadRequestException : Exception
     {

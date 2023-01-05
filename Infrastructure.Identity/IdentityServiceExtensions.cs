@@ -1,18 +1,18 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Template.Infrastructure.Identity.Models;
-using Template.Infrastructure.Identity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Template.Core.Application.Models.Authentication;
-using Template.Core.Application.Contracts.Identity;
 using Microsoft.EntityFrameworkCore;
+using Core.Models.Authentication;
+using Identity.Models;
+using Identity.Services;
+using Core.Contracts.Identity;
 
-namespace Template.Infrastructure.Identity
+namespace Identity
 {
     public static class IdentityServiceExtensions
     {

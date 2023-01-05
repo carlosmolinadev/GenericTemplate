@@ -1,7 +1,7 @@
 
+using Core.Contracts.Persistence;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Template.Core.Application.Contracts.Persistence;
 
 
 namespace Template.Server.Controllers
@@ -48,8 +48,8 @@ namespace Template.Server.Controllers
                 }
             }
 
-            var response = await customerRepository.ListAllAsync();
-            var customerAddress = await addressRepository.ListAllAsync();
+            var response = await customerRepository.GetAllAsynch();
+            var customerAddress = await addressRepository.GetAllAsynch();
             for (int i = 0; i < response.Count; i++)
             {
                 response[i].Address = customerAddress.FirstOrDefault();

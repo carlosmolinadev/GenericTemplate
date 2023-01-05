@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Template.Core.Application.Contracts.Infrastructure
+namespace Core.Contracts.Infrastructure
 {
     public interface ICsvExporter
     {

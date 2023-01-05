@@ -1,9 +1,9 @@
-﻿using Marques.EFCore.SnakeCase;
+﻿using Identity.Models;
+using Marques.EFCore.SnakeCase;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Template.Infrastructure.Identity.Models;
 
-namespace Template.Infrastructure.Identity
+namespace Identity
 {
     public class IdentityDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -14,7 +14,7 @@ namespace Template.Infrastructure.Identity
 
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

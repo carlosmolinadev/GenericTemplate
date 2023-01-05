@@ -1,6 +1,6 @@
-﻿using Template.Core.Application.Models.Authentication;
+﻿using Core.Models.Authentication;
 
-namespace Template.Core.Application.Contracts.Identity
+namespace Core.Contracts.Identity
 {
     public interface IAuthenticationService
     {

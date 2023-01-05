@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Core.Contracts.Identity;
+using Core.Models.Authentication;
+using Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Template.Core.Application.Contracts.Identity;
-using Template.Core.Application.Models.Authentication;
-using Template.Infrastructure.Identity.Models;
 
-namespace Template.Infrastructure.Identity.Services
+namespace Identity.Services
 {
     public class AuthenticationService : IAuthenticationService
     {

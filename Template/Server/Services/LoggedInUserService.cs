@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Core.Contracts;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Template.Core.Application.Contracts;
 
 namespace Template.Server.Services
 {

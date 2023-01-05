@@ -1,4 +1,4 @@
-﻿namespace Template.Core.Application.Contracts
+﻿namespace Core.Contracts
 {
     public interface ILoggedInUserService
     {

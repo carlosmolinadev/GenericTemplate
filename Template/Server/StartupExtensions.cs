@@ -1,9 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
-using Template.Core.Application;
-using Template.Core.Application.Contracts;
-using Template.Infrastructure.Identity;
+﻿using Core;
+using Core.Contracts;
+using Microsoft.OpenApi.Models;
+using Persistance.Dapper;
 //using Template.Infrastructure.Persistance;
-using Template.Infrastructure.Persistance.Dapper;
 using Template.Server.Services;
 
 namespace Template.Server

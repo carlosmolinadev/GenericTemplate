@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Template.Core.Application.Contracts.Persistence;
-using Template.Domain.Entities;
+﻿using Core.Contracts.Persistence;
+using Persistance;
 
 namespace Template.Infrastructure.Persistance.Repositories
 {

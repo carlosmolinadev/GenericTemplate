@@ -1,4 +1,4 @@
-﻿namespace Template.Core.Application.Responses
+﻿namespace Core.Responses
 {
     public class BaseResponse
     {

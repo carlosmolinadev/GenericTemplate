@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Core.Contracts.Persistence;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using System.Data.Common;
-using Template.Core.Application.Contracts.Persistence;
 using Template.Infrastructure.Persistance.Dapper.Repositories;
 
-namespace Template.Infrastructure.Persistance.Dapper
+namespace Persistance.Dapper
 {
     public static class PersistenceServiceRegistration
     {

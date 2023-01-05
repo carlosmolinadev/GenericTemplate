@@ -1,11 +1,7 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Domain.Entities;
 
-namespace Template.Core.Application.Contracts.Persistence
+namespace Core.Contracts.Persistence
 {
     public interface ICustomerRepositoryEntity : IRepositoryEntity<Customer>
     {

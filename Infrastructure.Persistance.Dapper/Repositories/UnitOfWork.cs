@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Core.Contracts.Persistence;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Template.Core.Application.Contracts.Persistence;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {

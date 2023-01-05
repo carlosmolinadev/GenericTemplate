@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 
 
-namespace Template.Core.Application.Profiles
+namespace Core.Profiles
 {
     public class MappingProfile : Profile
     {

@@ -1,10 +1,8 @@
 ﻿using Domain.Entities;
-using GloboTicket.TicketManagement.Domain.Common;
 using Marques.EFCore.SnakeCase;
 using Microsoft.EntityFrameworkCore;
-using Template.Core.Application.Contracts;
 
-namespace Template.Infrastructure.Persistance
+namespace Persistance
 {
     public class TemplateDbContext : DbContext
     {

@@ -1,8 +1,7 @@
-﻿using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Template.Core.Application.Contracts.Persistence;
+﻿using Core.Contracts.Persistence;
+using Domain.Entities;
 
-namespace Template.Infrastructure.Persistance.Repositories
+namespace Persistance.Repositories
 {
     public class CustomerRepository : Repository<Customer>, ICustomerRepositoryEntity
     {
@@ -12,8 +11,8 @@ namespace Template.Infrastructure.Persistance.Repositories
 
         public Task CustomImplementation(Customer customer)
         {
-            base._dbContext.Set<Customer>().AddAsync(customer);
-            base._dbContext.SaveChangesAsync();
+            _dbContext.Set<Customer>().AddAsync(customer);
+            _dbContext.SaveChangesAsync();
             return Task.CompletedTask;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Template.Core.Application.Models.Mail;
 
-namespace Template.Core.Application.Contracts.Infrastructure
+namespace Core.Contracts.Infrastructure
 {
     public interface IEmailService
     {

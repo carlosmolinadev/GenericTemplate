@@ -1,9 +1,9 @@
-﻿using Dapper;
+﻿using Core.Contracts.Persistence;
+using Dapper;
 using Npgsql;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
-using Template.Core.Application.Contracts.Persistence;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
@@ -62,7 +62,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             }
         }
 
-        public virtual async Task<IReadOnlyList<T>> ListAllAsync()
+        public virtual async Task<IReadOnlyList<T>> GetAllAsynch()
         {
             try
             {

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Template.Core.Application.Contracts.Persistence;
+﻿using Core.Contracts.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 
-namespace Template.Infrastructure.Persistance.Repositories
+namespace Persistance.Repositories
 {
     public class Repository<T> : IRepositoryEntity<T> where T : class
     {
@@ -35,7 +35,7 @@ namespace Template.Infrastructure.Persistance.Repositories
         }
 
         public virtual void UpdateAsync(T entity)
-        {   
+        {
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
 

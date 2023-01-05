@@ -1,8 +1,8 @@
-﻿using Domain.Entities;
+﻿using Core.Contracts.Persistence;
+using Domain.Entities;
 using Npgsql;
 using System.Data;
 using System.Data.Common;
-using Template.Core.Application.Contracts.Persistence;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Template.Core.Application.Models.Authentication
+namespace Core.Models.Authentication
 {
     public class RegistrationRequest
     {

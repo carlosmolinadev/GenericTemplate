@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Template.Core.Application
+namespace Core
 {
     public static class ApplicationServiceRegistration
     {
