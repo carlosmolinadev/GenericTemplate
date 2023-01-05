@@ -1,7 +1,8 @@
 ﻿using Dapper;
 using Npgsql;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Common;
+using System.Reflection;
 using Template.Core.Application.Contracts.Persistence;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
@@ -9,10 +10,10 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
     public class Repository<T> : IRepository<T> where T : class
     {
         //private readonly string _connectionString;
-        private readonly DbConnection _connection;
+        private readonly NpgsqlConnection _connection;
         private readonly string _tableName;
 
-        public Repository(DbConnection connection)
+        public Repository(NpgsqlConnection connection)
         {
             _connection = connection;
             _tableName = ToSnakeCase(typeof(T).Name);
@@ -23,7 +24,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             try
             {
                 var columns = string.Join(',', GetColumnNames());
-                var values = string.Join(',', GetColumnNames().Select(c => $"@{c}"));
+                var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
                 return await _connection.ExecuteScalarAsync<int>(
                     $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id",
                     entity);
@@ -79,7 +80,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             try
             {
-                var updates = string.Join(',', GetColumnNames().Select(c => $"{c} = @{c}"));
+                var updates = string.Join(',', GetColumnNames().Select((c, i) => $"{c} = @{GetColumnValues().ElementAt(i)}"));
                 var sql = $"UPDATE {_tableName} SET {updates} WHERE id = @id";
                 return await _connection.ExecuteAsync(sql, entity) > 0;
             }
@@ -106,8 +107,15 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         private IEnumerable<string> GetColumnNames()
         {
             return typeof(T)
-                .GetProperties().Where(p => p.Name != "Id")
+                .GetProperties().Where(p => p.Name != "Id" && !p.CustomAttributes.Any(a => a.AttributeType == typeof(NotMappedAttribute)))
                 .Select(p => ToSnakeCase(p.Name));
+        }
+
+        private IEnumerable<string> GetColumnValues()
+        {
+            return typeof(T)
+                .GetProperties().Where(p => p.Name != "Id" && !p.CustomAttributes.Any(a => a.AttributeType == typeof(NotMappedAttribute)))
+                .Select(p => p.Name);
         }
 
         private static string ToSnakeCase(string input)
@@ -118,41 +126,5 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 }
 
 
-
-
-//public class Repository<T> : IRepository<T> where T : class
-//{
-//    private readonly IDbConnection _connection;
-//    private readonly string _tableName;
-
-//    public Repository(IDbConnection connection)
-//    {
-//        _connection = connection;
-//        _tableName = typeof(T).Name;
-//    }
-
-//    public async Task<T> GetByIdAsync(int id)
-//    {
-//        return await _connection.QuerySingleOrDefaultAsync<T>($"Get{_tableName}ById", new { Id = id }, commandType: CommandType.StoredProcedure);
-//    }
-
-//    public async Task<IEnumerable<T>> GetAllAsync()
-//    {
-//        return await _connection.QueryAsync<T>($"GetAll{_tableName}", commandType: CommandType.StoredProcedure);
-//    }
-
-//    public async Task AddAsync(T entity)
-//    {
-//        await _connection.ExecuteAsync($"Insert{_tableName}", entity, commandType: CommandType.StoredProcedure);
-//    }
-
-//    public async Task UpdateAsync(T entity)
-//    {
-//        await _connection.ExecuteAsync($"Update{_tableName}", entity, commandType: CommandType.StoredProcedure);
-//    }
-
-//    public async Task DeleteAsync(T entity)
-//    {
-//        await _connection.ExecuteAsync($"Delete{_tableName}", entity, commandType: CommandType.StoredProcedure);
-//    }
-//}
+//var GetAttributes = typeof(T).GetProperties().Where(p => p.GetCustomAttributes(typeof(NotMappedAttribute), true).Any())
+//        .Select(p => p.GetCustomAttributes(typeof(NotMappedAttribute), true).FirstOrDefault()).ToArray();

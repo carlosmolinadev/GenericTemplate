@@ -1,8 +1,8 @@
-﻿using GloboTicket.TicketManagement.Domain.Common;
+﻿using Domain.Entities;
+using GloboTicket.TicketManagement.Domain.Common;
 using Marques.EFCore.SnakeCase;
 using Microsoft.EntityFrameworkCore;
 using Template.Core.Application.Contracts;
-using Template.Domain.Entities;
 
 namespace Template.Infrastructure.Persistance
 {

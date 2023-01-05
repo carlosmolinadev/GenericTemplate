@@ -9,9 +9,9 @@ namespace Template.Infrastructure.Persistance.Dapper
 {
     public static class PersistenceServiceRegistration
     {
-        public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistenceServices(this IServiceCollection services/*, IConfiguration configuration*/)
         {
-            services.AddTransient<DbConnection>((sp) => new NpgsqlConnection(configuration.GetConnectionString("DefaultConnection")));
+            //services.AddTransient((sp) => new NpgsqlConnection(configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             return services;

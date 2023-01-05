@@ -1,8 +1,8 @@
+
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Template.Core.Application.Contracts.Persistence;
-using Template.Domain.Entities;
-//using Template.Infrastructure.Persistance.Dapper;
-using Template.Shared;
+
 
 namespace Template.Server.Controllers
 {
@@ -28,22 +28,18 @@ namespace Template.Server.Controllers
         public async Task<IEnumerable<Customer>> Get()
         {
             var customerRepository = _unitOfWork.GetRepository<Customer>();
-            //var customerRepo = _unitOfWork.CustomerRepository;
-            var customer = new Customer { Id = 0, Name = "Carlos Alberto" };
-            var customerRe = _unitOfWork.GetCustomerRepository();
-            await customerRe.AddAsync(customer);
-            //await customerRepository.AddAsync(customer);
-            await _unitOfWork.Save();
-
-            for (int i = 0; i < 20; i++)
+            var addressRepository = _unitOfWork.GetRepository<Address>();
+            var customer = new Customer { Id = 0, Name = "Carlos Alberto", CreatedAt = DateTime.Now };
+            var customerId = await customerRepository.AddAsync(customer);
+            var address = new Address { Id = 1, Name = "Address1", CustomerId = customerId };
+            customer.Id = customerId;
+            customer.Name = String.Format("Customer #{0}", customerId);
+            await customerRepository.UpdateAsync(customer);
+            for (int i = 0; i < 5; i++)
             {
                 try
                 {
-                    //await customerRepository.AddAsync(customer);
-                    //await customerRepo.CustomImplementation(customer);
-                    await customerRe.AddAsync(customer);
-                    //customer.Name = String.Format("Customer #{0}", result);
-                    //await customerRepository.UpdateAsync(customer);
+                    await addressRepository.AddAsync(address);
                 }
                 catch (Exception e)
                 {
@@ -51,41 +47,25 @@ namespace Template.Server.Controllers
                     throw;
                 }
             }
+
+            var response = await customerRepository.ListAllAsync();
+            var customerAddress = await addressRepository.ListAllAsync();
+            for (int i = 0; i < response.Count; i++)
+            {
+                response[i].Address = customerAddress.FirstOrDefault();
+            }
+            //for (int i = 0; i < customerAddress.Count; i++)
+            //{
+            //    if(response[i].Address.Id == customerId)
+            //    {
+            //        response[i].Address = cus
+            //    }
+            //}
+
             await _unitOfWork.Save();
 
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    try
-            //    {
-            //        var customer = new Customer { Id = 0, Name = "Carlos Alberto", Middle = "TSTS" };
-            //        var result = await customerRepository.AddAsync(customer);
-            //        customer.Id = result;
-            //        customer.Name = String.Format("Customer #{0}", result);
-            //        await customerRepository.UpdateAsync(customer);
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        _logger.LogError(e.Message);
-            //        throw;
-            //    }
-            //}
-            //await _unitOfWork.Save();
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    var customer = new Customer { Id = 0, Name = "Carlos Alberto" };
-            //    var result = await customerRepository.AddAsync(customer);
-            //    customer.Id = result;
-            //    customer.Name = String.Format("Customer Second #{0}", result);
-            //    await customerRepository.UpdateAsync(customer);
-            //}
-            //await _unitOfWork.Save();
-            IEnumerable<Customer> response = new List<Customer>();
-            for (int i = 0; i < 1; i++)
-            {
-                //response = await customerRepository.ListAllAsync();
-
-            }
             return response.ToArray();
+            
 
             //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             //{

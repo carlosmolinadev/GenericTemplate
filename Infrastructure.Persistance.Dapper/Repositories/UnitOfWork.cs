@@ -1,22 +1,22 @@
-﻿using Npgsql;
-using System.Data;
-using System.Data.Common;
-using System.Diagnostics;
+﻿using Microsoft.Extensions.Configuration;
+using Npgsql;
 using Template.Core.Application.Contracts.Persistence;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        private readonly DbConnection _connection;
-        private DbTransaction _transaction;
+        private NpgsqlConnection _connection;
+        private NpgsqlTransaction _transaction;
         private bool _disposed = false;
+        private readonly IConfiguration _configuration;
 
-        public UnitOfWork(DbConnection connection)
+        public UnitOfWork(IConfiguration configuration)
         {
-            _connection = connection;
+            _connection = new NpgsqlConnection(configuration.GetConnectionString("DefaultConnection"));
             _connection.Open();
             _transaction = _connection.BeginTransaction();
+            _configuration = configuration;
         }
 
         public ICustomerRepository GetCustomerRepository()
@@ -31,6 +31,12 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 
         public async Task Save()
         {
+            if(_connection.State != System.Data.ConnectionState.Open)
+            {
+                _connection = new NpgsqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                _connection.Open();
+                _transaction = _connection.BeginTransaction();
+            }
             await CommitTransaction();
         }
 
@@ -48,7 +54,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             finally
             {
                 Dispose();
-                _transaction = await _connection.BeginTransactionAsync();
+                //_transaction = await _connection.BeginTransactionAsync();
             }
         }
 
@@ -65,28 +71,19 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 return;
             }
 
-            if (disposing)
+            if (_transaction != null)
             {
-                if (_transaction != null)
-                {
-                    _transaction.Dispose();
-                }
+                _transaction.Dispose();
+                _transaction = null;
             }
 
-            _disposed = true;
-            
-
+            _connection.Dispose();
         }
 
         ~UnitOfWork()
         {
             Dispose(false);
         }
-        //public void Dispose()
-        //{
-        //    _transaction?.DisposeAsync();
-        //}
-
     }
 }
 
@@ -299,4 +296,8 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 //    ~UnitOfWork()
 //    {
 //        Dispose(false);
+        //public void Dispose()
+        //{
+        //    _transaction?.DisposeAsync();
+        //}
 //    }
