@@ -1,6 +1,6 @@
 ﻿using Core.Contracts.Persistence;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Expressions;
 
 namespace Persistance.Repositories
 {
@@ -47,5 +47,91 @@ namespace Persistance.Repositories
                 _dbContext.Set<T>().Remove(entity);
             }
         }
+
+        public async Task<IReadOnlyList<T>> GetFilteredAsync(QueryFilter filter)
+        {
+            // Create a query that selects all entities of type T
+            var query = _dbContext.Set<T>().AsQueryable();
+
+            // Apply the filter conditions to the query
+            if (filter.Conditions != null)
+            {
+                foreach (var condition in filter.Conditions)
+                {
+                    // Use reflection to get the property with the name specified in the condition
+                    var prop = typeof(T).GetProperty(condition.Column);
+
+                    // Create a lambda expression that represents accessing the property
+                    var param = Expression.Parameter(typeof(T));
+                    var propAccess = Expression.MakeMemberAccess(param, prop);
+
+                    // Create a constant expression that represents the value to compare with
+                    var val = Expression.Constant(condition.Value);
+
+                    // Create an expression that represents the comparison specified in the condition
+                    Expression comparison;
+                    switch (condition.Operator)
+                    {
+                        case "=":
+                            comparison = Expression.Equal(propAccess, val);
+                            break;
+                        case ">":
+                            comparison = Expression.GreaterThan(propAccess, val);
+                            break;
+                        case ">=":
+                            comparison = Expression.GreaterThanOrEqual(propAccess, val);
+                            break;
+                        case "<":
+                            comparison = Expression.LessThan(propAccess, val);
+                            break;
+                        case "<=":
+                            comparison = Expression.LessThanOrEqual(propAccess, val);
+                            break;
+                        default:
+                            throw new ArgumentException($"Invalid operator: {condition.Operator}");
+                    }
+
+                    // Create a lambda expression that represents the comparison and pass it to the Where method
+                    var lambda = Expression.Lambda<Func<T, bool>>(comparison, param);
+                    query = query.Where(lambda);
+                }
+            }
+
+            // Apply the ordering specified in the filter to the query
+            if (filter.OrderByColumns != null)
+            {
+                foreach (var orderByColumn in filter.OrderByColumns)
+                {
+                    // Use reflection to get the property with the name specified in the OrderByColumn
+                    var prop = typeof(T).GetProperty(orderByColumn.Column);
+
+                    // Create a lambda expression that represents accessing the property
+                    var param = Expression.Parameter(typeof(T));
+                    var propAccess = Expression.MakeMemberAccess(param, prop);
+
+                    // Create a lambda expression that represents the order by and pass it to the OrderBy or OrderByDescending method
+                    var lambda = Expression.Lambda<Func<T, object>>(propAccess, param);
+                    if (orderByColumn.Direction == "asc")
+                    {
+                        query = query.OrderBy(lambda);
+                    }
+                    else
+                    {
+                        query = query.OrderByDescending(lambda);
+                    }
+                    // Apply paging to the query
+                    if (filter.Limit.HasValue && filter.Offset.HasValue)
+                    {
+                        query = query.Skip(filter.Offset.Value).Take(filter.Limit.Value);
+                        //query = query.Skip((page - 1) * size).Take(size);
+                    }
+                }
+            }
+
+            // Execute the query and return the results
+            return await query.ToListAsync();
+        }
+
     }
 }
+

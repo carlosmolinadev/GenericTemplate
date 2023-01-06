@@ -6,10 +6,9 @@ namespace Domain.Entities
     {
         
         public int Id { get; set; }
-        [ForeignKey("HiThere")]
         public string Name { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         [NotMapped]
-        public Address Address { get; set; }
+        public IEnumerable<Address> Addresses { get; set; }
     }
 }

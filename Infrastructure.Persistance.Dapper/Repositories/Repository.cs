@@ -39,8 +39,9 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             try
             {
+                var sql = ConvertSql($"SELECT * FROM {_tableName} WHERE id = @id");
                 return await _connection.QueryFirstOrDefaultAsync<T>(
-                    $"SELECT * FROM {_tableName} WHERE id = @id",
+                    sql,
                     new { id });
             }
             catch (Exception)
@@ -49,7 +50,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             }
         }
 
-        public virtual async Task<IReadOnlyList<T>> GetPagedReponseAsync(int page, int size)
+        public virtual async Task<IReadOnlyList<T>> GetFilteredPagedAsync(int page, int size)
         {
             try
             {
@@ -62,7 +63,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             }
         }
 
-        public virtual async Task<IReadOnlyList<T>> GetAllAsynch()
+        public virtual async Task<IReadOnlyList<T>> GetAllAsync()
         {
             try
             {
@@ -122,6 +123,66 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             return string.Concat(input.Select((c, i) => i > 0 && char.IsUpper(c) ? "_" + c.ToString() : c.ToString())).ToLower();
         }
+
+        public string ConvertSql(string sql)
+        {
+            // Get the properties of the class
+            var properties = typeof(T).GetProperties().Where(p => !p.CustomAttributes.Any(a => a.AttributeType == typeof(NotMappedAttribute)));
+
+            // Build the list of columns
+            var columns = new List<string>();
+            foreach (var property in properties)
+            {
+                // Get the column name for the property
+                var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
+                var columnName = columnAttribute != null ? columnAttribute.Name : ToSnakeCase(property.Name);
+
+                // Add the column to the list, with an optional alias
+                columns.Add(columnName == property.Name ? columnName : $"{columnName} as {property.Name}");
+            }
+
+            // Replace the SELECT * with the list of columns
+            return sql.Replace("*", string.Join(", ", columns));
+        }
+
+        public async Task<IReadOnlyList<T>> GetFilteredAsync(QueryFilter filter)
+        {
+            // Build the SQL query
+            var sql = ConvertSql($"SELECT * FROM {_tableName}");
+            var whereClauses = new List<string>();
+            var parameters = new DynamicParameters();
+            if (filter.Conditions != null)
+            {
+                // Add WHERE clauses for each filter condition
+                var i = 0;
+                foreach (var condition in filter.Conditions)
+                {
+                    whereClauses.Add($"{ToSnakeCase(condition.Column)} {condition.Operator} @p{i}");
+                    parameters.Add($"p{i}", condition.Value);
+                    i++;
+                }
+            }
+            if (whereClauses.Any())
+            {
+                sql += $" WHERE {string.Join(" AND ", whereClauses)}";
+            }
+            if (filter.OrderByColumns != null)
+            {
+                // Add ORDER BY clause for each OrderByColumn
+                var orderByClauses = filter.OrderByColumns.Select(x => $"{x.Column} {x.Direction}");
+                sql += $" ORDER BY {string.Join(", ", orderByClauses)}";
+            }
+            if (filter.Limit.HasValue && filter.Offset.HasValue)
+            {
+                // Add LIMIT and OFFSET clauses for paging
+                sql += $" LIMIT {filter.Limit} OFFSET {filter.Offset}";
+            }
+
+            // Execute the query and return the results
+            var result = await _connection.QueryAsync<T>(sql, parameters);
+            return result.ToList();
+        }
+
     }
 }
 

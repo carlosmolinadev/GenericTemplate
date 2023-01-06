@@ -30,11 +30,9 @@ namespace Template.Server.Controllers
             var customerRepository = _unitOfWork.GetRepository<Customer>();
             var addressRepository = _unitOfWork.GetRepository<Address>();
             var customer = new Customer { Id = 0, Name = "Carlos Alberto", CreatedAt = DateTime.Now };
-            var customerId = await customerRepository.AddAsync(customer);
-            var address = new Address { Id = 1, Name = "Address1", CustomerId = customerId };
-            customer.Id = customerId;
-            customer.Name = String.Format("Customer #{0}", customerId);
-            await customerRepository.UpdateAsync(customer);
+            customer.Id = await customerRepository.AddAsync(customer);
+            var address = new Address { Id = 1, Name = "Address1", CustomerId = customer.Id };
+
             for (int i = 0; i < 5; i++)
             {
                 try
@@ -47,20 +45,32 @@ namespace Template.Server.Controllers
                     throw;
                 }
             }
-
-            var response = await customerRepository.GetAllAsynch();
-            var customerAddress = await addressRepository.GetAllAsynch();
-            for (int i = 0; i < response.Count; i++)
+            var filter = new QueryFilter
             {
-                response[i].Address = customerAddress.FirstOrDefault();
-            }
-            //for (int i = 0; i < customerAddress.Count; i++)
-            //{
-            //    if(response[i].Address.Id == customerId)
-            //    {
-            //        response[i].Address = cus
-            //    }
-            //}
+                Conditions = new List<QueryCondition>
+                {
+                    new QueryCondition
+                    {
+                        Column = "customer_id",
+                        Value = 69
+
+                    }
+                },
+                //OrderByColumns = new List<OrderByColumn>
+                //{
+                //    new OrderByColumn
+                //    {
+                //        Column = "MyColumn"
+                //    }
+                //},
+                //Limit = 10,
+                //Offset = 0
+            };
+            var address1 = await addressRepository.GetByIdAsync(1);
+            var customer1 = await customerRepository.GetByIdAsync(69);
+            var addresses = await addressRepository.GetFilteredAsync(filter);
+            var response = await customerRepository.GetAllAsync();
+            
 
             await _unitOfWork.Save();
 
@@ -77,3 +87,25 @@ namespace Template.Server.Controllers
         }
     }
 }
+
+//var filter = new QueryFilter
+//{
+//    Conditions = new List<QueryCondition>
+//                {
+//                    new QueryCondition
+//                    {
+//                        Column = "MyColumn",
+//                        Value = "MyValue"
+
+//                    }
+//                },
+//    OrderByColumns = new List<OrderByColumn>
+//                {
+//                    new OrderByColumn
+//                    {
+//                        Column = "MyColumn"
+//                    }
+//                },
+//    Limit = 10,
+//    Offset = 0
+//};

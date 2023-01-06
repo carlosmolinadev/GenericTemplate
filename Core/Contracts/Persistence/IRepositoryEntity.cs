@@ -13,6 +13,6 @@ namespace Core.Contracts.Persistence
         Task AddAsync(T entity);
         void UpdateAsync(T entity);
         Task DeleteAsync(int id);
-        Task<IReadOnlyList<T>> GetPagedReponseAsync(int page, int size);
+        Task<IReadOnlyList<T>> GetFilteredAsync(QueryFilter filter);
     }
 }

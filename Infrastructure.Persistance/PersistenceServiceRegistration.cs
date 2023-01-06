@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistance;
 using Persistance.Repositories;
-using Template.Infrastructure.Persistance.Repositories;
 
 namespace Template.Infrastructure.Persistance
 {

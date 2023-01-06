@@ -1,7 +1,7 @@
 ﻿using Core.Contracts.Persistence;
 using Persistance;
 
-namespace Template.Infrastructure.Persistance.Repositories
+namespace Persistance.Repositories
 {
     public class UnitOfWork : IUnitOfWorkEntity
     {
