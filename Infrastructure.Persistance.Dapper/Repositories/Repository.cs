@@ -3,7 +3,9 @@ using Dapper;
 using Npgsql;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
@@ -182,9 +184,73 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             var result = await _connection.QueryAsync<T>(sql, parameters);
             return result.ToList();
         }
-
     }
 }
+
+//};
+
+
+//public void BulkInsert<TEntity>(IEnumerable<TEntity> entities)
+//{
+//    using (var connection = new SqlConnection(_connectionString))
+//    {
+//        connection.Open();
+
+//        var tableName = typeof(TEntity).Name;
+//        var columns = GetColumnNames(typeof(TEntity));
+
+//        var values = new StringBuilder();
+//        foreach (var entity in entities)
+//        {
+//            values.Append("(");
+//            values.Append(string.Join(", ", GetPropertyValues(entity)));
+//            values.Append("), ");
+//        }
+//        values.Remove(values.Length - 2, 2);
+
+//        var sql = $"INSERT INTO {tableName} ({string.Join(", ", columns)}) VALUES {values}";
+//        connection.Execute(sql);
+//    }
+//}
+
+
+//public void BulkUpdate<TEntity>(IEnumerable<TEntity> entities)
+//{
+//    using (var connection = new SqlConnection(_connectionString))
+//    {
+//        connection.Open();
+
+//        var tableName = typeof(TEntity).Name;
+//        var columns = GetColumnNames(typeof(TEntity));
+
+//        var values = new StringBuilder();
+//        foreach (var entity in entities)
+//        {
+//            values.Append("(");
+//            values.Append(string.Join(", ", GetPropertyValues(entity)));
+//            values.Append("), ");
+//        }
+//        values.Remove(values.Length - 2, 2);
+
+//        var sql = $"UPDATE {tableName} SET ({string.Join(", ", columns)}) = ({values}) WHERE Id IN ({string.Join(", ", GetIdValues(entities))})";
+//        connection.Execute(sql);
+//    }
+//}
+
+//private IEnumerable<string> GetColumnNames(Type type)
+//{
+//    return type.GetProperties().Select(p => p.Name);
+//}
+
+//private IEnumerable<object> GetPropertyValues(object obj)
+//{
+//    return obj.GetType().GetProperties().Select(p => p.GetValue(obj));
+//}
+
+//private IEnumerable<object> GetIdValues(IEnumerable<TEntity> entities)
+//{
+//    return entities.Select(e => e.Id);
+//}
 
 
 //var GetAttributes = typeof(T).GetProperties().Where(p => p.GetCustomAttributes(typeof(NotMappedAttribute), true).Any())
