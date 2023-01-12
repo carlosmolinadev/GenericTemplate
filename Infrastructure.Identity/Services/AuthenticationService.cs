@@ -25,6 +25,24 @@ namespace Identity.Services
             _signInManager = signInManager;
         }
 
+        public async Task<bool> AddRolesAsync(AddRolesRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                throw new Exception($"User with {request.Email} was not found.");
+            }
+
+            var result = await _userManager.AddToRolesAsync(user, request.Roles);
+
+            if (!result.Succeeded)
+            {
+                throw new Exception($"Unable to create roles for '{request.Email}'.");
+            }
+
+            return true;
+        }
+
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);

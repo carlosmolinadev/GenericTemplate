@@ -27,9 +27,9 @@ namespace Template.Server.Controllers
         [HttpGet]
         public async Task<IEnumerable<Customer>> Get()
         {
-            var customerRepository = _unitOfWork.GetRepository<Customer>();
+            var customerRepository = _unitOfWork.GetRepository<CustomerDTO>();
             var addressRepository = _unitOfWork.GetRepository<Address>();
-            var customer = new Customer { Id = 0, Name = "Carlos Alberto", CreatedAt = DateTime.Now };
+            var customer = new CustomerDTO { Id = 0, Name = "Carlos Alberto", CreatedAt = DateTime.Now };
             customer.Id = await customerRepository.AddAsync(customer);
             var address = new Address { Id = 1, Name = "Address1", CustomerId = customer.Id };
 
