@@ -1,6 +1,7 @@
 ﻿using Core.Contracts.Persistence;
 using Dapper;
 using Npgsql;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.Common;
@@ -103,14 +104,16 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             {
                 var columns = string.Join(',', GetColumnNames());
                 var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
-                var primaryKey = GetPrimaryKeys().FirstOrDefault();
-                if (primaryKey == null)
+                var primaryKey = GetPrimaryKeyType().FirstOrDefault();
+
+                if (primaryKey != null && primaryKey.Name != "Int32")
                 {
-                    primaryKey = "id";
+                    return await _connection.ExecuteAsync($"INSERT INTO {_tableName} ({columns}) VALUES ({values})", entity);
                 }
-                return await _connection.ExecuteScalarAsync<int>(
-                    $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {primaryKey}",
-                    entity);
+                else
+                {
+                    return await _connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
+                }
             }
             catch (Exception)
             {
@@ -160,11 +163,11 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 .Select(p => p.Name);
         }
 
-        private IEnumerable<string> GetPrimaryKeys()
+        private IEnumerable<Type> GetPrimaryKeyType()
         {
             return typeof(T)
                 .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute)))
-                .Select(p => p.Name);
+                .Select(p => p.PropertyType);
         }
 
         private static string ToSnakeCase(string input)
