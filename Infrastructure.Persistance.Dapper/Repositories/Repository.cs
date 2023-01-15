@@ -49,8 +49,8 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             try
             {
-                var result = await _connection.QueryAsync<T>(
-                $"SELECT * FROM {_tableName}");
+                var sql = ConvertSql($"SELECT * FROM {_tableName}");
+                var result = await _connection.QueryAsync<T>(sql);
                 return result.ToList();
             }
             catch (Exception)
@@ -103,8 +103,13 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             {
                 var columns = string.Join(',', GetColumnNames());
                 var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
+                var primaryKey = GetPrimaryKeys().FirstOrDefault();
+                if (primaryKey == null)
+                {
+                    primaryKey = "id";
+                }
                 return await _connection.ExecuteScalarAsync<int>(
-                    $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id",
+                    $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {primaryKey}",
                     entity);
             }
             catch (Exception)
@@ -152,6 +157,13 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             return typeof(T)
                 .GetProperties().Where(p => p.Name != "Id" && !p.CustomAttributes.Any(a => a.AttributeType == typeof(NotMappedAttribute)))
+                .Select(p => p.Name);
+        }
+
+        private IEnumerable<string> GetPrimaryKeys()
+        {
+            return typeof(T)
+                .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute)))
                 .Select(p => p.Name);
         }
 
