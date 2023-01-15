@@ -3,6 +3,7 @@ using Dapper;
 using Npgsql;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,10 +12,10 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly NpgsqlConnection _connection;
+        private readonly DbConnection _connection;
         private readonly string _tableName;
 
-        public Repository(NpgsqlConnection connection)
+        public Repository(DbConnection connection)
         {
             var tableAttr = typeof(T).GetCustomAttribute<TableAttribute>();
             if (tableAttr != null)

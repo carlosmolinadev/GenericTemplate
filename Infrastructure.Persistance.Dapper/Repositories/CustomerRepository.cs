@@ -8,7 +8,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
     public class CustomerRepository : Repository<Customer>, ICustomerRepository
     {
-        public CustomerRepository(NpgsqlConnection connection) : base(connection)
+        public CustomerRepository(DbConnection connection) : base(connection)
         {
         }
 

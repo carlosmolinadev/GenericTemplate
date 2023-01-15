@@ -1,10 +1,10 @@
-﻿namespace Core.Contracts.Persistence
+﻿using Domain.Entities;
+
+namespace Core.Contracts.Persistence
 {
     public interface IUnitOfWorkEntity : IDisposable
     {
         Task Save();
-        IRepositoryEntity<TEntity> GetRepository<TEntity>() where TEntity : class;
-
-        ICustomerRepositoryEntity CustomerRepository { get; }
+        IRepositoryEntity<Customer> Customer { get; }
     }
 }

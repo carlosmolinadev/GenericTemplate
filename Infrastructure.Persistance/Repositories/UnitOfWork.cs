@@ -1,30 +1,25 @@
 ﻿using Core.Contracts.Persistence;
-using Persistance;
+using Domain.Entities;
 
 namespace Persistance.Repositories
 {
     public class UnitOfWork : IUnitOfWorkEntity
     {
         private readonly TemplateDbContext _context;
-        public readonly ICustomerRepositoryEntity _customerRepository;
+        private IRepositoryEntity<Customer> _customer;
 
-        public UnitOfWork(TemplateDbContext context, ICustomerRepositoryEntity customerRepository)
+        public UnitOfWork(TemplateDbContext context)
         {
             _context = context;
-            _customerRepository = customerRepository;
         }
 
-        public ICustomerRepositoryEntity CustomerRepository => _customerRepository;
+        public IRepositoryEntity<Customer> Customer => _customer ??= new Repository<Customer>(_context);
+
 
         public void Dispose()
         {
             _context.Dispose();
             GC.SuppressFinalize(this);
-        }
-
-        public IRepositoryEntity<TEntity> GetRepository<TEntity>() where TEntity : class
-        {
-            return new Repository<TEntity>(_context);
         }
 
         public async Task Save()
@@ -33,17 +28,3 @@ namespace Persistance.Repositories
         }
     }
 }
-
-
-//private CustomerRepository _customer;
-//public Repository<Customer>? CustomerRepository
-//{
-//    get
-//    {
-//        if(_customer == null)
-//        {
-//            _customer = new CustomerRepository(_context);
-//        }
-//        return _customer;
-//    }
-//}

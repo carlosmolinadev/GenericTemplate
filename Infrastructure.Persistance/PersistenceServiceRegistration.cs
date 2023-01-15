@@ -13,9 +13,10 @@ namespace Template.Infrastructure.Persistance
         {
             services.AddDbContext<TemplateDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped(typeof(IRepositoryEntity<>), typeof(Repository<>));
+
             services.AddScoped<IUnitOfWorkEntity, UnitOfWork>();
-            services.AddScoped<ICustomerRepositoryEntity, CustomerRepository>();
+            //services.AddScoped<ICustomerRepositoryEntity, CustomerRepository>();
+            //services.AddScoped(typeof(IRepositoryEntity<>), typeof(Repository<>));
 
 
 

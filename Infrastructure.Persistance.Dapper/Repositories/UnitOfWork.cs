@@ -1,46 +1,32 @@
 ﻿using Core.Contracts.Persistence;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using System.Data.Common;
 
 namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        private NpgsqlConnection _connection;
-        private NpgsqlTransaction _transaction;
+        private DbTransaction _transaction;
+        private readonly DbConnection _connection;
         private bool _disposed = false;
-        private readonly IConfiguration _configuration;
 
-        public UnitOfWork(IConfiguration configuration)
+        public UnitOfWork(DbConnection connection)
         {
-            _connection = new NpgsqlConnection(configuration.GetConnectionString("DefaultConnection"));
+            _connection = connection;
             _connection.Open();
-            _transaction = _connection.BeginTransaction();
-            _configuration = configuration;
         }
 
-        public ICustomerRepository GetCustomerRepository()
+        public DbConnection Connection => _connection;
+
+        public DbTransaction Transaction => _transaction;
+
+        public async Task BeginAsync()
         {
-            return new CustomerRepository(_connection);
+            _transaction = await _connection.BeginTransactionAsync();
         }
 
-        public IRepository<TEntity> GetRepository<TEntity>() where TEntity : class
-        {
-            return new Repository<TEntity>(_connection);
-        }
-
-        public async Task Save()
-        {
-            if(_connection.State != System.Data.ConnectionState.Open)
-            {
-                _connection = new NpgsqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-                _connection.Open();
-                _transaction = _connection.BeginTransaction();
-            }
-            await CommitTransaction();
-        }
-
-        private async Task CommitTransaction()
+        public async void CommitAsync()
         {
             try
             {
@@ -54,7 +40,6 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             finally
             {
                 Dispose();
-                //_transaction = await _connection.BeginTransactionAsync();
             }
         }
 
@@ -66,18 +51,17 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed)
+            if (!_disposed)
             {
-                return;
+                if (disposing)
+                {
+                    if (_transaction != null)
+                    {
+                        _transaction.Dispose();
+                    }
+                }
+                _disposed = true;
             }
-
-            if (_transaction != null)
-            {
-                _transaction.Dispose();
-                _transaction = null;
-            }
-
-            _connection.Dispose();
         }
 
         ~UnitOfWork()
@@ -86,6 +70,89 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         }
     }
 }
+
+
+//public class UnitOfWork : IUnitOfWork, IDisposable
+//{
+//    private NpgsqlConnection _connection;
+//    private NpgsqlTransaction _transaction;
+//    private bool _disposed = false;
+//    private readonly IConfiguration _configuration;
+
+//    public UnitOfWork(NpgsqlConnection connection)
+//    {
+//        _connection.Open();
+//        _transaction = _connection.BeginTransaction();
+//        _configuration = configuration;
+//    }
+
+//    public ICustomerRepository GetCustomerRepository()
+//    {
+//        return new CustomerRepository(_connection);
+//    }
+
+//    public IRepository<TEntity> GetRepository<TEntity>() where TEntity : class
+//    {
+//        return new Repository<TEntity>(_connection);
+//    }
+
+//    public async Task Save()
+//    {
+//        if (_connection.State != System.Data.ConnectionState.Open)
+//        {
+//            _connection = new NpgsqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+//            _connection.Open();
+//            _transaction = _connection.BeginTransaction();
+//        }
+//        await CommitTransaction();
+//    }
+
+//    private async Task CommitTransaction()
+//    {
+//        try
+//        {
+//            await _transaction.CommitAsync();
+//        }
+//        catch (Exception)
+//        {
+//            await _transaction.RollbackAsync();
+//            throw;
+//        }
+//        finally
+//        {
+//            Dispose();
+//            //_transaction = await _connection.BeginTransactionAsync();
+//        }
+//    }
+
+//    public void Dispose()
+//    {
+//        Dispose(true);
+//        GC.SuppressFinalize(this);
+//    }
+
+//    protected virtual void Dispose(bool disposing)
+//    {
+//        if (_disposed)
+//        {
+//            return;
+//        }
+
+//        if (_transaction != null)
+//        {
+//            _transaction.Dispose();
+//            _transaction = null;
+//        }
+
+//        _connection.Dispose();
+//    }
+
+//    ~UnitOfWork()
+//    {
+//        Dispose(false);
+//    }
+//}
+
 
 ////Sync
 //public class UnitOfWork : IUnitOfWork, IDisposable
