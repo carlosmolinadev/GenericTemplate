@@ -104,15 +104,21 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             {
                 var columns = string.Join(',', GetColumnNames());
                 var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
-                var primaryKey = GetPrimaryKeyType().FirstOrDefault();
+                var primaryKey = GetPrimaryKeyType();
 
-                if (primaryKey != null && primaryKey.Name != "Int32")
+                if (primaryKey == null)
                 {
-                    return await _connection.ExecuteAsync($"INSERT INTO {_tableName} ({columns}) VALUES ({values})", entity);
+                    return await _connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
+                }
+                else if (primaryKey.PropertyType.Name != "String")
+                {
+                    return await _connection.ExecuteScalarAsync<int>(
+                         $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {ToSnakeCase(primaryKey.Name)}", entity);
                 }
                 else
                 {
-                    return await _connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
+                    return await _connection.ExecuteAsync(
+                         $"INSERT INTO {_tableName} ({columns}) VALUES ({values})", entity);
                 }
             }
             catch (Exception)
@@ -163,11 +169,10 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 .Select(p => p.Name);
         }
 
-        private IEnumerable<Type> GetPrimaryKeyType()
+        private PropertyInfo GetPrimaryKeyType()
         {
             return typeof(T)
-                .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute)))
-                .Select(p => p.PropertyType);
+                .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute))).First();
         }
 
         private static string ToSnakeCase(string input)
