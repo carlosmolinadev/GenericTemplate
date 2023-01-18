@@ -2,7 +2,6 @@
 using Core.Contracts;
 using Microsoft.OpenApi.Models;
 using Persistance.Dapper;
-//using Template.Infrastructure.Persistance;
 using Template.Server.Services;
 
 namespace Template.Server
@@ -16,7 +15,7 @@ namespace Template.Server
 
             builder.Services.AddApplicationServices();
             //builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddPersistenceServices(); //builder.Configuration
+            builder.Services.AddPersistenceServices(builder.Configuration); //builder.Configuration
             //builder.Services.AddIdentityServices(builder.Configuration);
 
             builder.Services.AddHttpContextAccessor();

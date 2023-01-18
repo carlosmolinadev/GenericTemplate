@@ -13,10 +13,10 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly DbConnection _connection;
         private readonly string _tableName;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public Repository(DbConnection connection)
+        public Repository(DbConnection connection, IUnitOfWork unitOfWork)
         {
             var tableAttr = typeof(T).GetCustomAttribute<TableAttribute>();
             if (tableAttr != null)
@@ -28,7 +28,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 _tableName = ToSnakeCase(typeof(T).Name);
             }
 
-            _connection = connection;
+            _unitOfWork = unitOfWork;
         }
 
         public virtual async Task<T?> GetByIdAsync(int id)
@@ -36,7 +36,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             try
             {
                 var sql = ConvertSql($"SELECT * FROM {_tableName} WHERE id = @id");
-                return await _connection.QueryFirstOrDefaultAsync<T>(
+                return await _unitOfWork.Connection.QueryFirstOrDefaultAsync<T>(
                     sql,
                     new { id });
             }
@@ -51,7 +51,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             try
             {
                 var sql = ConvertSql($"SELECT * FROM {_tableName}");
-                var result = await _connection.QueryAsync<T>(sql);
+                var result = await _unitOfWork.Connection.QueryAsync<T>(sql);
                 return result.ToList();
             }
             catch (Exception)
@@ -94,7 +94,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             }
 
             // Execute the query and return the results
-            var result = await _connection.QueryAsync<T>(sql, parameters);
+            var result = await _unitOfWork.Connection.QueryAsync<T>(sql, parameters);
             return result.ToList();
         }
 
@@ -104,20 +104,20 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             {
                 var columns = string.Join(',', GetColumnNames());
                 var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
-                var primaryKey = GetPrimaryKeyType();
+                var primaryKey = GetPrimaryKeyInfo();
 
                 if (primaryKey == null)
                 {
-                    return await _connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
+                    return await _unitOfWork.Connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
                 }
                 else if (primaryKey.PropertyType.Name != "String")
                 {
-                    return await _connection.ExecuteScalarAsync<int>(
+                    return await _unitOfWork.Connection.ExecuteScalarAsync<int>(
                          $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {ToSnakeCase(primaryKey.Name)}", entity);
                 }
                 else
                 {
-                    return await _connection.ExecuteAsync(
+                    return await _unitOfWork.Connection.ExecuteAsync(
                          $"INSERT INTO {_tableName} ({columns}) VALUES ({values})", entity);
                 }
             }
@@ -131,9 +131,15 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             try
             {
+                var primaryKey = GetPrimaryKeyInfo();
                 var updates = string.Join(',', GetColumnNames().Select((c, i) => $"{c} = @{GetColumnValues().ElementAt(i)}"));
                 var sql = $"UPDATE {_tableName} SET {updates} WHERE id = @id";
-                return await _connection.ExecuteAsync(sql, entity) > 0;
+                if (primaryKey != null)
+                {
+                    sql = $"UPDATE {_tableName} SET {updates} WHERE {ToSnakeCase(primaryKey.Name)} = @{primaryKey.Name}";
+                }
+
+                return await _unitOfWork.Connection.ExecuteAsync(sql, entity) > 0;
             }
             catch (Exception)
             {
@@ -145,7 +151,7 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
         {
             try
             {
-                return await _connection.ExecuteAsync(
+                return await _unitOfWork.Connection.ExecuteAsync(
                 $"DELETE FROM {_tableName} WHERE id = @id",
                 new { id }) > 0;
             }
@@ -169,15 +175,15 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 .Select(p => p.Name);
         }
 
-        private PropertyInfo GetPrimaryKeyType()
-        {
-            return typeof(T)
-                .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute))).First();
-        }
-
         private static string ToSnakeCase(string input)
         {
             return string.Concat(input.Select((c, i) => i > 0 && char.IsUpper(c) ? "_" + c.ToString() : c.ToString())).ToLower();
+        }
+
+        private PropertyInfo GetPrimaryKeyInfo()
+        {
+            return typeof(T)
+                .GetProperties().Where(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute))).First();
         }
 
         public string ConvertSql(string sql)
