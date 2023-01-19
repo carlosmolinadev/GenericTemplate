@@ -105,21 +105,18 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
                 var columns = string.Join(',', GetColumnNames());
                 var values = string.Join(',', GetColumnValues().Select(c => $"@{c}"));
                 var primaryKey = GetPrimaryKeyInfo();
+                var sql = $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id";
 
-                if (primaryKey == null)
+                if (primaryKey != null)
                 {
-                    return await _unitOfWork.Connection.ExecuteScalarAsync<int>($"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING id", entity);
+                    sql = $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {ToSnakeCase(primaryKey.Name)}";
+                    if (primaryKey.PropertyType == typeof(string))
+                    {
+                        return await _unitOfWork.Connection.ExecuteAsync(sql, entity);
+                    }
                 }
-                else if (primaryKey.PropertyType.Name != "String")
-                {
-                    return await _unitOfWork.Connection.ExecuteScalarAsync<int>(
-                         $"INSERT INTO {_tableName} ({columns}) VALUES ({values}) RETURNING {ToSnakeCase(primaryKey.Name)}", entity);
-                }
-                else
-                {
-                    return await _unitOfWork.Connection.ExecuteAsync(
-                         $"INSERT INTO {_tableName} ({columns}) VALUES ({values})", entity);
-                }
+
+                return await _unitOfWork.Connection.ExecuteScalarAsync<int>(sql, entity);
             }
             catch (Exception)
             {
@@ -147,13 +144,18 @@ namespace Template.Infrastructure.Persistance.Dapper.Repositories
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(int id)
+        public virtual async Task<bool> DeleteAsync(T entity)
         {
             try
             {
-                return await _unitOfWork.Connection.ExecuteAsync(
-                $"DELETE FROM {_tableName} WHERE id = @id",
-                new { id }) > 0;
+                var primaryKey = GetPrimaryKeyInfo();
+                var sql = $"DELETE FROM {_tableName} WHERE id = @id";
+                if (primaryKey != null)
+                {
+                    sql = $"DELETE FROM {_tableName} WHERE {ToSnakeCase(primaryKey.Name)} = @{primaryKey.Name}";
+                }
+
+                return await _unitOfWork.Connection.ExecuteAsync(sql, entity) > 0;
             }
             catch (Exception)
             {
